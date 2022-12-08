@@ -86,9 +86,9 @@ class SimpleWeightedTable implements Stringable
                 $weight = $this->getColumnWeight($row, $columnIndex++);
 
                 if ($weight > 1) {
-                    $tr->appendChild(new Element('th', $column, ['colspan' => $weight]));
+                    $tr->appendChild(new Element('td', $column, ['colspan' => $weight]));
                 } else {
-                    $tr->appendChild(new Element('th', $column));
+                    $tr->appendChild(new Element('td', $column));
                 }
             }
         }
