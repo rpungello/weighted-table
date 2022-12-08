@@ -15,7 +15,8 @@
         }
     ],
     "require": {
-        "php": "^8.1"
+        "php": "^8.1",
+        "anahkiasen/html-object": "^1.4"
     },
     "require-dev": {
         "pestphp/pest": "^1.20",
