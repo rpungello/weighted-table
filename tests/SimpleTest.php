@@ -39,6 +39,12 @@ it('can calculate total weight', function () {
 });
 
 it('can compile html', function () {
-    $instance = new SimpleWeightedTable([['Column 1', 'Column 2', 'Column 3'], ['Value 1', 'Value 2'], ['Value 3']], [2]);
+    $instance = new SimpleWeightedTable([['Column 1', 'Column 2', 'Column 3'], ['Value 1', 'Value 2'], ['Value 3']], [2], 1, false);
     expect($instance->__toString())->toBe('<table><thead><tr><th colspan="2">Column 1</th><th>Column 2</th><th>Column 3</th></tr></thead><tbody><tr><td colspan="2">Value 1</td><td colspan="2">Value 2</td></tr><tr><td colspan="4">Value 3</td></tr></tbody></table>');
 });
+
+it('can compile html with alternate row coloring', function () {
+    $instance = new SimpleWeightedTable([['Column 1', 'Column 2', 'Column 3'], ['Value 1', 'Value 2'], ['Value 3']], [2]);
+    expect($instance->__toString())->toBe('<table><thead><tr><th colspan="2">Column 1</th><th>Column 2</th><th>Column 3</th></tr></thead><tbody><tr class="odd"><td colspan="2">Value 1</td><td colspan="2">Value 2</td></tr><tr class="even"><td colspan="4">Value 3</td></tr></tbody></table>');
+});
+

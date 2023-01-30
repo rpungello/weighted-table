@@ -11,7 +11,7 @@ class SimpleWeightedTable implements Stringable
 
     protected int $numberOfColumns = 0;
 
-    public function __construct(array $rows = [], protected array $weights = [], protected int $numberOfHeaderRows = 1)
+    public function __construct(array $rows = [], protected array $weights = [], protected int $numberOfHeaderRows = 1, protected bool $alternateRowColoring = true)
     {
         array_walk($rows, fn ($row) => $this->addRow($row));
     }
@@ -79,8 +79,19 @@ class SimpleWeightedTable implements Stringable
     {
         $tbody = new Element('tbody');
 
+        $oddRow = true;
         foreach ($this->getBodyRows() as $row) {
-            $tbody->appendChild($tr = new Element('tr'));
+            if ($this->alternateRowColoring) {
+                if ($oddRow) {
+                    $tbody->appendChild($tr = new Element('tr', attributes: ['class' => 'odd']));
+                } else {
+                    $tbody->appendChild($tr = new Element('tr', attributes: ['class' => 'even']));
+                }
+            } else {
+                $tbody->appendChild($tr = new Element('tr'));
+            }
+            $oddRow = ! $oddRow;
+
             $columnIndex = 0;
             foreach ($row as $column) {
                 $weight = $this->getColumnWeight($row, $columnIndex++);
