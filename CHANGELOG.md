@@ -2,6 +2,10 @@
 
 All notable changes to `weighted-table` will be documented in this file.
 
+## 0.3.1 - 2023-01-31
+
+- Disable alternate-row coloring by default
+
 ## 0.3.0 - 2023-01-31
 
 - Add ability to apply custom classes to rows
