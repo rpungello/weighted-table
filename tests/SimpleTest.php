@@ -1,5 +1,6 @@
 <?php
 
+use Rpungello\WeightedTable\Row;
 use Rpungello\WeightedTable\SimpleWeightedTable;
 
 it('can instantiate class', function () {
@@ -47,3 +48,13 @@ it('can compile html with alternate row coloring', function () {
     $instance = new SimpleWeightedTable([['Column 1', 'Column 2', 'Column 3'], ['Value 1', 'Value 2'], ['Value 3']], [2]);
     expect($instance->__toString())->toBe('<table><thead><tr><th colspan="2">Column 1</th><th>Column 2</th><th>Column 3</th></tr></thead><tbody><tr class="odd"><td colspan="2">Value 1</td><td colspan="2">Value 2</td></tr><tr class="even"><td colspan="4">Value 3</td></tr></tbody></table>');
 });
+
+it('can compile html with custom classes', function () {
+    $instance = new SimpleWeightedTable();
+    $instance->addRow(new Row(['Column 1', 'Column 2', 'Column 3'], 'class0'));
+    $instance->addRow(new Row(['Value 1', 'Value 2'], 'class1'));
+    $instance->addRow(new Row(['Value 3'], 'class2'));
+    $instance->setWeights([2]);
+    expect($instance->__toString())->toBe('<table><thead><tr class="class0"><th colspan="2">Column 1</th><th>Column 2</th><th>Column 3</th></tr></thead><tbody><tr class="class1"><td colspan="2">Value 1</td><td colspan="2">Value 2</td></tr><tr class="class2"><td colspan="4">Value 3</td></tr></tbody></table>');
+});
+

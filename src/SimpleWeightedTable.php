@@ -16,8 +16,12 @@ class SimpleWeightedTable implements Stringable
         array_walk($rows, fn ($row) => $this->addRow($row));
     }
 
-    public function addRow(array $row): void
+    public function addRow(Row|array $row): void
     {
+        if (is_array($row)) {
+            $row = new Row($row);
+        }
+
         $this->rows[] = $row;
         $this->numberOfColumns = max($this->numberOfColumns, count($row));
     }
@@ -58,18 +62,10 @@ class SimpleWeightedTable implements Stringable
     {
         $thead = new Element('thead');
 
+        $rowIndex = 1;
+        /** @var Row $row */
         foreach ($this->getHeaderRows() as $row) {
-            $thead->appendChild($tr = new Element('tr'));
-            $columnIndex = 0;
-            foreach ($row as $column) {
-                $weight = $this->getColumnWeight($row, $columnIndex++);
-
-                if ($weight > 1) {
-                    $tr->appendChild(new Element('th', $column, ['colspan' => $weight]));
-                } else {
-                    $tr->appendChild(new Element('th', $column));
-                }
-            }
+            $thead->appendChild($this->getElementFromRow($row, $rowIndex++, 'th'));
         }
 
         return $thead;
@@ -79,35 +75,46 @@ class SimpleWeightedTable implements Stringable
     {
         $tbody = new Element('tbody');
 
-        $oddRow = true;
+        $rowIndex = 1;
+        /** @var Row $row */
         foreach ($this->getBodyRows() as $row) {
-            if ($this->alternateRowColoring) {
-                if ($oddRow) {
-                    $tbody->appendChild($tr = new Element('tr', attributes: ['class' => 'odd']));
-                } else {
-                    $tbody->appendChild($tr = new Element('tr', attributes: ['class' => 'even']));
-                }
-            } else {
-                $tbody->appendChild($tr = new Element('tr'));
-            }
-            $oddRow = ! $oddRow;
-
-            $columnIndex = 0;
-            foreach ($row as $column) {
-                $weight = $this->getColumnWeight($row, $columnIndex++);
-
-                if ($weight > 1) {
-                    $tr->appendChild(new Element('td', $column, ['colspan' => $weight]));
-                } else {
-                    $tr->appendChild(new Element('td', $column));
-                }
-            }
+            $tbody->appendChild($this->getElementFromRow($row, $rowIndex++));
         }
 
         return $tbody;
     }
 
-    protected function getColumnWeight(array $row, int $columnIndex): int
+    protected function getElementFromRow(Row $row, int $rowIndex, string $cellTag = 'td'): Element
+    {
+        $rowAttributes = [];
+
+        if ($row->hasClass()) {
+            $rowAttributes['class'] = $row->getClass();
+        } elseif ($this->alternateRowColoring && $cellTag === 'td') {
+            if ($rowIndex % 2 === 0) {
+                $rowAttributes['class'] = 'even';
+            } else {
+                $rowAttributes['class'] = 'odd';
+            }
+        }
+
+        $tr = new Element('tr', attributes: $rowAttributes);
+
+        $columnIndex = 0;
+        foreach ($row->getCells() as $cell) {
+            $weight = $this->getColumnWeight($row, $columnIndex++);
+
+            if ($weight > 1) {
+                $tr->appendChild(new Element($cellTag, $cell, ['colspan' => $weight]));
+            } else {
+                $tr->appendChild(new Element($cellTag, $cell));
+            }
+        }
+
+        return $tr;
+    }
+
+    protected function getColumnWeight(Row $row, int $columnIndex): int
     {
         if ($columnIndex >= count($this->weights)) {
             $weight = 1;
@@ -122,7 +129,7 @@ class SimpleWeightedTable implements Stringable
         return $weight;
     }
 
-    protected function getTotalRowWeight(array $row): int
+    protected function getTotalRowWeight(Row $row): int
     {
         $weight = 0;
 
