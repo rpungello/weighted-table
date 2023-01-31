@@ -11,7 +11,7 @@ class SimpleWeightedTable implements Stringable
 
     protected int $numberOfColumns = 0;
 
-    public function __construct(array $rows = [], protected array $weights = [], protected int $numberOfHeaderRows = 1, protected bool $alternateRowColoring = true)
+    public function __construct(array $rows = [], protected array $weights = [], protected int $numberOfHeaderRows = 1, protected bool $alternateRowColoring = false)
     {
         array_walk($rows, fn ($row) => $this->addRow($row));
     }
